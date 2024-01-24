@@ -5,8 +5,9 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class OrganisationDTO {
+public class AddressDTO {
     private String id;
-    private String name;
-    private String countryCode;
+    private String addresslineOne;
+    private String addresslineTwo;
+    private String postcode;
 }

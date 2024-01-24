@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXIST patient (
     id UUID NOT NULL DEFAULT uuid_generate_v4(),
     nhs_number NOT NULL VARCHAR(10),
     gp_id UUID FOREIGN KEY REFERENCES gp(id),
+    address_id FOREIGN KEY REFERENCES address(id),
     title USER_TITLE,
     forename VARCHAR(35),
     middlenames VARCHAR(35),
@@ -14,6 +15,14 @@ CREATE TABLE IF NOT EXIST patient (
     contact_number VARCHAR(15),
     alternate_contact_number VARCHAR(15),
     date_of_birth DATE,
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXIST address (
+    id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    address_line_one VARCHAR(35),
+    address_line_two VARCHAR(35),
+    postcode VARCHAR(8),
     PRIMARY KEY(id)
 );
 
@@ -47,9 +56,7 @@ CREATE TABLE IF NOT EXIST organisation (
 
 CREATE TABLE IF NOT EXIST gp_surgery (
     id UUID NOT NULL DEFAULT uuid_generate_v4(),
-    address_line_one VARCHAR(35),
-    address_line_two VARCHAR(35),
-    postcode VARCHAR(8),
+    address_id FOREIGN KEY REFERENCES address(id),
     country_code VARCHAR(6),
     contact_number VARCHAR(15),
     contact_email VARCHAR(320),

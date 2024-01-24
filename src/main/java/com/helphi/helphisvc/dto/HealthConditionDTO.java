@@ -5,8 +5,9 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class OrganisationDTO {
+public class HealthConditionDTO {
     private String id;
+    private String organisationId;
     private String name;
-    private String countryCode;
+    private String shortName;
 }
