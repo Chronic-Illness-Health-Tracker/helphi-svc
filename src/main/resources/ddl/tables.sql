@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXIST clinitian (
     PRIMARY KEY(id)
 );
 
-CREATE TABLE IF NOT EXIST condition (
+CREATE TABLE IF NOT EXIST health_condition (
     id UUID NOT NULL DEFAULT uuid_generate_v4(),
     organisation_id UUID FOREIGN KEY REFERENCES organisation(id),
     name VARCHAR(45),
@@ -51,6 +51,8 @@ CREATE TABLE IF NOT EXIST organisation (
     id UUID NOT NULL DEFAULT uuid_generate_v4(),
     name VARCHAR(45),
     country_code VARCHAR(6),
+    address_id UUID FOREIGN KEY REFERENCES address(id),
+    contact_number VARCHAR(15),
     PRIMARY KEY(id)
 );
 
@@ -59,17 +61,18 @@ CREATE TABLE IF NOT EXIST gp_surgery (
     address_id FOREIGN KEY REFERENCES address(id),
     country_code VARCHAR(6),
     contact_number VARCHAR(15),
-    contact_email VARCHAR(320),
+    email VARCHAR(320),
     PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXIST gp (
     id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    title USER_TITLE,
     forename VARCHAR(35),
     middlenames VARCHAR(35),
     lastname VARCHAR(35),
     contact_number VARCHAR(15),
-    contact_email VARCHAR(320),
+    email VARCHAR(320),
     surgery_id FOREIGN KEY REFERENCES gp_surgery(id),
     PRIMARY KEY(id)
 );

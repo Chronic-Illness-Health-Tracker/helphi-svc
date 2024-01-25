@@ -20,3 +20,4 @@ public class PatientDTO {
     private String gpId;
     private String addressId;
 }
+

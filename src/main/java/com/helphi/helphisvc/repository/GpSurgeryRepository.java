@@ -1,9 +1,9 @@
 package com.helphi.helphisvc.repository;
 
-import com.helphi.helphisvc.dto.GpSurgeryDTO;
+import com.helphi.api.GpSurgery;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface GpSurgeryRepository extends JpaRepository<GpSurgeryDTO, String> {
+public interface GpSurgeryRepository extends JpaRepository<GpSurgery, String> {
 }
