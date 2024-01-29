@@ -1,4 +1,4 @@
-package com.helphi.helphisvc.svc;
+package com.helphi.svc;
 
 public class ClinitianService {
     
