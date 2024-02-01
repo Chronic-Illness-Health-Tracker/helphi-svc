@@ -16,7 +16,7 @@ CREATE SCHEMA helphi;
 CREATE TYPE user_title AS ENUM ('Mr', 'Mrs', 'Miss', 'Ms', 'Mx', 'Dr', 'Prof', 'Revd');
 
 CREATE TABLE IF NOT EXISTS helphi.address (
-    id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    id UUID NOT NULL DEFAULT extensions.uuid_generate_v4(),
     address_line_one VARCHAR(35),
     address_line_two VARCHAR(35),
     postcode VARCHAR(8),
@@ -24,25 +24,25 @@ CREATE TABLE IF NOT EXISTS helphi.address (
 );
 
 CREATE TABLE IF NOT EXISTS helphi.organisation (
-    id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    id UUID NOT NULL DEFAULT extensions.uuid_generate_v4(),
     name VARCHAR(45),
     country_code VARCHAR(6),
-    address_id UUID REFERENCES address(id),
+    address_id UUID REFERENCES helphi.address(id),
     contact_number VARCHAR(15),
     PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS helphi.health_condition (
-    id UUID NOT NULL DEFAULT uuid_generate_v4(),
-    organisation_id UUID REFERENCES organisation(id),
+    id UUID NOT NULL DEFAULT extensions.uuid_generate_v4(),
+    organisation_id UUID REFERENCES helphi.organisation(id),
     name VARCHAR(45),
     short_name VARCHAR(5),
     PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS helphi.clinitian (
-    id UUID NOT NULL DEFAULT uuid_generate_v4(),
-    organisation_id UUID REFERENCES organisation(id),
+    id UUID NOT NULL DEFAULT extensions.uuid_generate_v4(),
+    organisation_id UUID REFERENCES helphi.organisation(id),
     title USER_TITLE,
     forename VARCHAR(35),
     middlenames VARCHAR(35),
@@ -54,8 +54,8 @@ CREATE TABLE IF NOT EXISTS helphi.clinitian (
 );
 
 CREATE TABLE IF NOT EXISTS helphi.gp_surgery (
-    id UUID NOT NULL DEFAULT uuid_generate_v4(),
-    address_id UUID REFERENCES address(id),
+    id UUID NOT NULL DEFAULT extensions.uuid_generate_v4(),
+    address_id UUID REFERENCES helphi.address(id),
     country_code VARCHAR(6),
     contact_number VARCHAR(15),
     email VARCHAR(320),
@@ -63,22 +63,22 @@ CREATE TABLE IF NOT EXISTS helphi.gp_surgery (
 );
 
 CREATE TABLE IF NOT EXISTS helphi.gp (
-    id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    id UUID NOT NULL DEFAULT extensions.uuid_generate_v4(),
     title USER_TITLE,
     forename VARCHAR(35),
     middlenames VARCHAR(35),
     lastname VARCHAR(35),
     contact_number VARCHAR(15),
     email VARCHAR(320),
-    surgery_id UUID REFERENCES gp_surgery(id),
+    surgery_id UUID REFERENCES helphi.gp_surgery(id),
     PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS helphi.patient (
-    id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    id UUID NOT NULL DEFAULT extensions.uuid_generate_v4(),
     nhs_number VARCHAR(10) NOT NULL,
-    gp_id UUID REFERENCES gp(id),
-    address_id UUID REFERENCES address(id),
+    gp_id UUID REFERENCES helphi.gp(id),
+    address_id UUID REFERENCES helphi.address(id),
     title USER_TITLE,
     forename VARCHAR(35),
     middlenames VARCHAR(35),
@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS helphi.patient (
 
 
 CREATE TABLE IF NOT EXISTS helphi.patient_condition_link (
-    patient_id UUID REFERENCES patient(id) NOT NULL,
-    health_condition_id UUID REFERENCES health_condition(id) NOT NULL,
+    patient_id UUID REFERENCES helphi.patient(id) NOT NULL,
+    health_condition_id UUID REFERENCES helphi.health_condition(id) NOT NULL,
     PRIMARY KEY (patient_id, health_condition_id)
 );
