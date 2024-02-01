@@ -1,6 +1,7 @@
 package com.helphi;
 
 import com.helphi.question.api.grpc.QuestionServiceGrpc;
+import com.helphi.repository.HealthConditionRepository;
 import com.helphi.repository.PatientRepository;
 import com.helphi.svc.PatientService;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -23,8 +24,9 @@ public class HelphiConfiguration {
     @Bean
     @Autowired
     PatientService petientService(PatientRepository patientRepository,
+                                  HealthConditionRepository conditionRepository,
                                   QuestionServiceGrpc.QuestionServiceBlockingStub blockingStub) {
-        return new PatientService(patientRepository, blockingStub);
+        return new PatientService(patientRepository, conditionRepository, blockingStub);
     }
 
 

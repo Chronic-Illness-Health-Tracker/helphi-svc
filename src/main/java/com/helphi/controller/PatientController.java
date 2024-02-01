@@ -1,18 +1,46 @@
 package com.helphi.controller;
 
+import com.helphi.api.user.Patient;
 import com.helphi.svc.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 public class PatientController {
 
-    @Autowired
-    private PatientService svc;
+    private final PatientService patientService;
 
-    @GetMapping(value = "/test")
-    public void test() {
-        this.svc.getPatientCheckIns();
+    @Autowired
+    public PatientController(PatientService patientService) {
+        this.patientService = patientService;
+    }
+
+    @GetMapping(value = "/patient/{patientId}")
+    public ResponseEntity<Patient> getPatient(@RequestParam(name = "patientId") String patientId) {
+        Optional<Patient> patient =  this.patientService.getPatient(UUID.fromString(patientId));
+        if(patient.isPresent()) {
+            return ResponseEntity.ok().body(patient.get()) ;
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping(value = "/patient")
+    public Patient createPatient(@RequestBody Patient patient) {
+        return this.patientService.createPatient(patient);
+    }
+
+    @PutMapping(value = "/patient")
+    public Patient updatePatient(@RequestBody Patient patient) {
+        return this.patientService.updatePatient(patient);
+    }
+
+    @DeleteMapping(value = "/patient/{patientId}")
+    public void deletePatient(@RequestParam(name = "patientId") String patientId) {
+        this.patientService.deletePatient(UUID.fromString(patientId));
     }
 }

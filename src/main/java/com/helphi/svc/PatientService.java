@@ -2,6 +2,7 @@ package com.helphi.svc;
 
 import com.helphi.api.user.Patient;
 import com.helphi.question.api.grpc.*;
+import com.helphi.repository.HealthConditionRepository;
 import com.helphi.repository.PatientRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,15 +11,19 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.UUID;
 
-@Service
 public class PatientService {
 
     private final PatientRepository patientRepository;
+    private final HealthConditionRepository conditionRepository;
     private final QuestionServiceGrpc.QuestionServiceBlockingStub questionSvc;
 
     @Autowired
-    public PatientService(PatientRepository patientRepository, QuestionServiceGrpc.QuestionServiceBlockingStub questionSvc) {
+    public PatientService(PatientRepository patientRepository,
+                          HealthConditionRepository conditionRepository,
+                          QuestionServiceGrpc.QuestionServiceBlockingStub questionSvc)
+    {
         this.patientRepository = patientRepository;
+        this.conditionRepository = conditionRepository;
         this.questionSvc = questionSvc;
     }
     
@@ -26,7 +31,7 @@ public class PatientService {
         return this.patientRepository.findById(patientId);
     }
 
-    public Patient addPatient(Patient patient) throws IllegalArgumentException {
+    public Patient createPatient(Patient patient) throws IllegalArgumentException {
         return this.patientRepository.save(patient);
     }
 
@@ -38,12 +43,11 @@ public class PatientService {
         this.patientRepository.deleteById(patientId);
     }
 
-    public void getPatientConditions() {
-
+    public void getPatientConditions(UUID userId) {
     }
 
-    public void addConditionToPatient() {
-
+    public void addConditionToPatient(UUID conditionId) {
+        this.patientRepository.
     }
 
     public void getPatientsInCondition() {
