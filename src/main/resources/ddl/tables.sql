@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS helphi.organisation (
     id UUID NOT NULL DEFAULT extensions.uuid_generate_v4(),
     name VARCHAR(45),
     country_code VARCHAR(6),
+    email VARCHAR(320),
     address_id UUID REFERENCES helphi.address(id),
     contact_number VARCHAR(15),
     PRIMARY KEY(id)
@@ -55,6 +56,7 @@ CREATE TABLE IF NOT EXISTS helphi.clinitian (
 
 CREATE TABLE IF NOT EXISTS helphi.gp_surgery (
     id UUID NOT NULL DEFAULT extensions.uuid_generate_v4(),
+    name VARCHAR(45),
     address_id UUID REFERENCES helphi.address(id),
     country_code VARCHAR(6),
     contact_number VARCHAR(15),
