@@ -18,7 +18,7 @@ public class UserController {
     public UserController(UserService userService) {
         this.userService = userService;
     }
-    @GetMapping(name = "/user/{userId}")
+    @GetMapping(value = "/user/{userId}")
     public User getUser(@PathVariable(value = "userId") String userId) {
         return this.userService.getUser(UUID.fromString(userId));
     }

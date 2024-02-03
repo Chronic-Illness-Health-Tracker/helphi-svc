@@ -20,13 +20,9 @@ public class PatientController {
     }
 
     @GetMapping(value = "/patient/{patientId}")
-    public ResponseEntity<Patient> getPatient(@RequestParam(name = "patientId") String patientId) {
+    public ResponseEntity<Patient> getPatient(@PathVariable(name = "patientId" ) String patientId) {
         Optional<Patient> patient =  this.patientService.getPatient(UUID.fromString(patientId));
-        if(patient.isPresent()) {
-            return ResponseEntity.ok().body(patient.get()) ;
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return patient.map(value -> ResponseEntity.ok().body(value)).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping(value = "/patient")
@@ -40,7 +36,7 @@ public class PatientController {
     }
 
     @DeleteMapping(value = "/patient/{patientId}")
-    public void deletePatient(@RequestParam(name = "patientId") String patientId) {
+    public void deletePatient(@PathVariable(name = "patientId") String patientId) {
         this.patientService.deletePatient(UUID.fromString(patientId));
     }
 }
