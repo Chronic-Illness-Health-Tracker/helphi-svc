@@ -18,14 +18,12 @@ public class LoginController {
         this.loginService = loginService;
     }
 
-    @GetMapping(name = "/login")
-    public Response login(@RequestBody Request loginRequest) {
-        return null;
+    // @GetMapping(name = "/login")
+    // public void login(@RequestBody Request loginRequest) {
+    // }
 
-    }
+    // @GetMapping(name = "/logout")
+    // public void logout() {
 
-    @GetMapping(name = "/logout")
-    public void logout() {
-
-    }
+    // }
 }

@@ -47,7 +47,6 @@ public class PatientService {
     }
 
     public void addConditionToPatient(UUID conditionId) {
-        this.patientRepository.
     }
 
     public void getPatientsInCondition() {
