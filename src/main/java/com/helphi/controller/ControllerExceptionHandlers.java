@@ -1,7 +1,10 @@
 package com.helphi.controller;
 
+import com.helphi.exception.ForeignKeyConstraintException;
 import jakarta.validation.ConstraintViolationException;
+import org.postgresql.util.PSQLException;
 import org.springdoc.api.ErrorMessage;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,7 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ControllerExceptionHandlers {
-    @ExceptionHandler(value = {ConstraintViolationException.class})
+    @ExceptionHandler(value = { ConstraintViolationException.class })
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ResponseEntity<?> resourceNotFoundException(ConstraintViolationException ex) {
         StringBuilder sb = new StringBuilder();
@@ -21,4 +24,18 @@ public class ControllerExceptionHandlers {
         ErrorMessage msg = new ErrorMessage(sb.toString());
         return ResponseEntity.badRequest().body(msg);
     }
+
+    @ExceptionHandler(value = { ForeignKeyConstraintException.class })
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ResponseEntity<?> foreignKeyConstraintException(ForeignKeyConstraintException ex) {
+        ErrorMessage msg = new ErrorMessage(ex.getLocalizedMessage());
+        return ResponseEntity.badRequest().body(msg);
+    }
+
+/*    @ExceptionHandler(value = { Throwable.class })
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ResponseEntity<?> genericException(Throwable ex) {
+        ErrorMessage msg = new ErrorMessage("Could not complete request");
+        return ResponseEntity.badRequest().body(msg);
+    }*/
 }
