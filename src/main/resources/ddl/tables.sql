@@ -28,17 +28,19 @@ CREATE TABLE IF NOT EXISTS helphi.organisation (
     name VARCHAR(45),
     country_code VARCHAR(6),
     email VARCHAR(320),
-    address_id UUID REFERENCES helphi.address(id),
+    address_id UUID,
     contact_number VARCHAR(15),
-    PRIMARY KEY(id)
+    PRIMARY KEY(id),
+    CONSTRAINT fk_address FOREIGN KEY(address_id) REFERENCES helphi.address(id)
 );
 
 CREATE TABLE IF NOT EXISTS helphi.health_condition (
     id UUID NOT NULL DEFAULT extensions.uuid_generate_v4(),
-    organisation_id UUID REFERENCES helphi.organisation(id),
+    organisation_id UUID NOT NULL,
     name VARCHAR(45),
     short_name VARCHAR(5),
-    PRIMARY KEY(id)
+    PRIMARY KEY(id),
+    CONSTRAINT fk_organisation FOREIGN KEY(organisation_id) REFERENCES helphi.organisation(id)
 );
 
 CREATE TABLE IF NOT EXISTS helphi.clinitian (
@@ -51,17 +53,19 @@ CREATE TABLE IF NOT EXISTS helphi.clinitian (
     email VARCHAR(320),
     contact_number VARCHAR(15),
     alternate_contact_number VARCHAR(15),
-    PRIMARY KEY(id)
+    PRIMARY KEY(id),
+    CONSTRAINT fk_organisation FOREIGN KEY(organisation_id) REFERENCES helphi.organisation(id)
 );
 
 CREATE TABLE IF NOT EXISTS helphi.gp_surgery (
     id UUID NOT NULL DEFAULT extensions.uuid_generate_v4(),
     name VARCHAR(45),
-    address_id UUID REFERENCES helphi.address(id),
+    address_id UUID,
     country_code VARCHAR(6),
     contact_number VARCHAR(15),
     email VARCHAR(320),
-    PRIMARY KEY(id)
+    PRIMARY KEY(id),
+    CONSTRAINT fk_address FOREIGN KEY(address_id) REFERENCES helphi.address(id)
 );
 
 CREATE TABLE IF NOT EXISTS helphi.gp (
@@ -72,14 +76,15 @@ CREATE TABLE IF NOT EXISTS helphi.gp (
     lastname VARCHAR(35),
     contact_number VARCHAR(15),
     email VARCHAR(320),
-    surgery_id UUID REFERENCES helphi.gp_surgery(id),
-    PRIMARY KEY(id)
+    surgery_id UUID,
+    PRIMARY KEY(id),
+    CONSTRAINT fk_surgery FOREIGN KEY(surgery_id) REFERENCES helphi.gp_surgery(id)
 );
 
 CREATE TABLE IF NOT EXISTS helphi.patient (
     id UUID NOT NULL DEFAULT extensions.uuid_generate_v4(),
     nhs_number VARCHAR(10) NOT NULL,
-    gp_id UUID REFERENCES helphi.gp(id),
+    gp_id UUID,
     address_id UUID REFERENCES helphi.address(id),
     title USER_TITLE,
     forename VARCHAR(35),
@@ -89,12 +94,16 @@ CREATE TABLE IF NOT EXISTS helphi.patient (
     contact_number VARCHAR(15),
     alternate_contact_number VARCHAR(15),
     date_of_birth DATE,
-    PRIMARY KEY(id)
+    PRIMARY KEY(id),
+    CONSTRAINT fk_gp FOREIGN KEY(gp_id) REFERENCES helphi.gp(id),
+    CONSTRAINT fk_address FOREIGN KEY(address_id) REFERENCES helphi.address(id)
 );
 
 
 CREATE TABLE IF NOT EXISTS helphi.patient_condition_link (
-    patient_id UUID REFERENCES helphi.patient(id) NOT NULL,
-    health_condition_id UUID REFERENCES helphi.health_condition(id) NOT NULL,
-    PRIMARY KEY (patient_id, health_condition_id)
+    patient_id UUID NOT NULL,
+    health_condition_id UUID NOT NULL,
+    PRIMARY KEY (patient_id, health_condition_id),
+    CONSTRAINT fk_patient FOREIGN KEY(patient_id) REFERENCES helphi.patient(id),
+    CONSTRAINT fk_health_condition FOREIGN KEY(health_condition_id) REFERENCES helphi.health_condition(id)
 );
