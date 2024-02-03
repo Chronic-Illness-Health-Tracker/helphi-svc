@@ -23,7 +23,7 @@ public class HelphiConfiguration {
     /* IDE can incorrectly say bean cannot be autowired. Ignore */
     @Bean
     @Autowired
-    PatientService petientService(PatientRepository patientRepository,
+    PatientService patientService(PatientRepository patientRepository,
                                   HealthConditionRepository conditionRepository,
                                   QuestionServiceGrpc.QuestionServiceBlockingStub blockingStub) {
         return new PatientService(patientRepository, conditionRepository, blockingStub);
