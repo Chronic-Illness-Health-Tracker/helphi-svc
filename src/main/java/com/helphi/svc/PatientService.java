@@ -59,7 +59,7 @@ public class PatientService {
                 .setConditionId(conditionId.toString())
                 .build();
 
-        GetUserReponsesReply response = this.questionSvc.getUsersResponsesForCondition(request);
+        GetUserResponsesReply response = this.questionSvc.getUsersResponsesForCondition(request);
 
         /*TODO return response */
 
