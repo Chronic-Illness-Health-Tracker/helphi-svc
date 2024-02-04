@@ -1,6 +1,7 @@
 package com.helphi.svc;
 
 import com.helphi.api.user.Patient;
+import com.helphi.exception.NotFoundException;
 import com.helphi.question.api.grpc.*;
 import com.helphi.repository.HealthConditionRepository;
 import com.helphi.repository.PatientRepository;
@@ -27,20 +28,30 @@ public class PatientService {
         this.questionSvc = questionSvc;
     }
     
-    public Optional<Patient> getPatient(UUID patientId) throws IllegalArgumentException {
-        return this.patientRepository.findById(patientId);
+    public Optional<Patient> getPatient(UUID patientId) throws NotFoundException {
+        try {
+            return this.patientRepository.findById(patientId);
+        } catch (IllegalArgumentException ex) {
+            throw new NotFoundException(String.format("Patient with id %s cannot be found", patientId.toString()));
+        }
     }
 
     public Patient createPatient(Patient patient) throws IllegalArgumentException {
         return this.patientRepository.save(patient);
     }
 
-    public Patient updatePatient(Patient patient) throws IllegalArgumentException, EntityNotFoundException {
-        return this.patientRepository.save(patient);
+    public Patient updatePatient(Patient patient) throws IllegalArgumentException {
+        return this.patientRepository.findById(patient.getId())
+            .map(existingPatient -> this.patientRepository.save(patient))
+            .orElseThrow(() -> new NotFoundException(String.format("Patient with id %s cannot be found", patient.getId().toString())));
     }
 
-    public void deletePatient(UUID patientId) throws IllegalArgumentException {
-        this.patientRepository.deleteById(patientId);
+    public void deletePatient(UUID patientId) throws NotFoundException {
+        try {
+            this.patientRepository.deleteById(patientId);
+        } catch (IllegalArgumentException ex) {
+            throw new NotFoundException(String.format("Patient with id %s cannot be found", patientId.toString()));
+        }
     }
 
     public void getPatientConditions(UUID userId) {

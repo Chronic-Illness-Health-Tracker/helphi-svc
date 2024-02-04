@@ -26,6 +26,20 @@ public class OrganisationService {
     }
 
     public Organisation createOrganisation(Organisation organisation) throws IllegalArgumentException {
+        organisation.setId(null);
+        return validateAndSave(organisation);
+    }
+
+
+    public Organisation updateOrganisation(Organisation organisation) throws IllegalArgumentException, EntityNotFoundException {
+        return validateAndSave(organisation);
+    }
+
+    public void deleteOrganisation(UUID organisationId) throws IllegalArgumentException {
+        this.organisationRepository.deleteById(organisationId);
+    }
+
+    private Organisation validateAndSave(Organisation organisation) {
         String postcode = organisation.getContactAddress().getPostcode();
         organisation.getContactAddress().setPostcode(postcode.replaceAll("\\s",""));
 
@@ -33,13 +47,5 @@ public class OrganisationService {
         address.ifPresent(organisation::setContactAddress);
 
         return this.organisationRepository.save(organisation);
-    }
-
-    public Organisation updateOrganisation(Organisation organisation) throws IllegalArgumentException, EntityNotFoundException {
-        return this.organisationRepository.save(organisation);
-    }
-
-    public void deleteOrganisation(UUID organisationId) throws IllegalArgumentException {
-        this.organisationRepository.deleteById(organisationId);
     }
 }

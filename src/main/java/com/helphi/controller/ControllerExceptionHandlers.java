@@ -1,6 +1,7 @@
 package com.helphi.controller;
 
 import com.helphi.exception.ForeignKeyConstraintException;
+import com.helphi.exception.NotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.postgresql.util.PSQLException;
 import org.springdoc.api.ErrorMessage;
@@ -28,6 +29,13 @@ public class ControllerExceptionHandlers {
     @ExceptionHandler(value = { ForeignKeyConstraintException.class })
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ResponseEntity<?> foreignKeyConstraintException(ForeignKeyConstraintException ex) {
+        ErrorMessage msg = new ErrorMessage(ex.getLocalizedMessage());
+        return ResponseEntity.badRequest().body(msg);
+    }
+
+    @ExceptionHandler(value = { NotFoundException.class })
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public ResponseEntity<?> notFoundException(NotFoundException ex) {
         ErrorMessage msg = new ErrorMessage(ex.getLocalizedMessage());
         return ResponseEntity.badRequest().body(msg);
     }
