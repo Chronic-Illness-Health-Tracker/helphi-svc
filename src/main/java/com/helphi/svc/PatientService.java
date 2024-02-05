@@ -1,6 +1,8 @@
 package com.helphi.svc;
 
+import com.helphi.api.HealthCondition;
 import com.helphi.api.user.Patient;
+import com.helphi.exception.DuplicateEntityException;
 import com.helphi.exception.NotFoundException;
 import com.helphi.question.api.grpc.*;
 import com.helphi.repository.HealthConditionRepository;
@@ -9,22 +11,23 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public class PatientService {
 
     private final PatientRepository patientRepository;
-    private final HealthConditionRepository conditionRepository;
+    private final HealthConditionService healthConditionService;
     private final QuestionServiceGrpc.QuestionServiceBlockingStub questionSvc;
 
     @Autowired
     public PatientService(PatientRepository patientRepository,
-                          HealthConditionRepository conditionRepository,
+                          HealthConditionService healthConditionService,
                           QuestionServiceGrpc.QuestionServiceBlockingStub questionSvc)
     {
         this.patientRepository = patientRepository;
-        this.conditionRepository = conditionRepository;
+        this.healthConditionService = healthConditionService;
         this.questionSvc = questionSvc;
     }
     
@@ -54,27 +57,65 @@ public class PatientService {
         }
     }
 
-    public void getPatientConditions(UUID userId) {
+    public Patient addHealthCondition(UUID patientId, HealthCondition healthCondition) {
+        return findAndAddCondition(patientId, healthCondition);
     }
 
-    public void addConditionToPatient(UUID conditionId) {
+    public Patient addHealthConditionById(UUID patientId, UUID healthConditionId) {
+        Optional<HealthCondition> healthCondition = this.healthConditionService.getCondition(healthConditionId);
+        healthCondition.orElseThrow(() -> new NotFoundException(String.format("Condition with id %s does not exist", healthConditionId.toString())));
+        return findAndAddCondition(patientId, healthCondition.get());
     }
 
-    public void getPatientsInCondition() {
+    public Patient deleteHealthConditionById(UUID patientId, UUID healthConditionId) {
+        Optional<HealthCondition> healthCondition = this.healthConditionService.getCondition(healthConditionId);
+        healthCondition.orElseThrow(() -> new NotFoundException(String.format("Condition with id %s does not exist", healthConditionId.toString())));
+
+        return this.patientRepository.findById(patientId)
+            .map(patient -> {
+                List<HealthCondition> patientConditions = patient.getConditions();
+                HealthCondition conditionToRemove = patientConditions.stream()
+                    .filter(condition -> condition.getId().equals(healthConditionId)).findFirst()
+                    .orElseThrow(() -> new NotFoundException(String.format("Patient is not associated with condition with id %s", healthConditionId)));
+
+                patientConditions.remove(conditionToRemove);
+                patient.setConditions(patientConditions);
+
+                return this.patientRepository.save(patient);
+            })
+            .orElseThrow(() -> new NotFoundException(String.format("Patient with id %s could not be found", patientId)));
+    }
+
+    public List<Patient> getPatientsInCondition(UUID healthConditionId) {
+        return this.patientRepository.findByHealthConditionId(healthConditionId);
 
     }
 
     public void getPatientCheckInsForCondition(UUID userId, UUID conditionId) {
-        var request = GetUsersResponsesForConditionRequest.newBuilder()
+/*        var request = GetUsersResponsesForConditionRequest.newBuilder()
                 .setUserId(userId.toString())
                 .setConditionId(conditionId.toString())
                 .build();
 
         GetUserResponsesReply response = this.questionSvc.getUsersResponsesForCondition(request);
 
-        /*TODO return response */
+        *//*TODO return response */
 
     }
 
-
+    private Patient findAndAddCondition(UUID patientId, HealthCondition healthCondition) {
+        return this.patientRepository.findById(patientId)
+                .map(patient ->  {
+                    if(patient.getConditions().contains(healthCondition)) {
+                        String message = String.format("%s %s is already a member of the %s group ",
+                                patient.getForename(), patient.getLastname(), healthCondition.getName());
+                        String details = String.format("Patient %s is already associated with condition %s ", patient.getId(),
+                                healthCondition.getId());
+                        throw new DuplicateEntityException(message, details);
+                    }
+                    patient.getConditions().add(healthCondition);
+                    return this.patientRepository.save(patient);
+                })
+                .orElseThrow(() -> new NotFoundException(String.format("Patient with ID %s could not be found", patientId.toString())));
+    }
 }

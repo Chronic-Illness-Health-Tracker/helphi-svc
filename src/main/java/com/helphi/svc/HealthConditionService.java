@@ -28,7 +28,7 @@ public class HealthConditionService {
     public HealthCondition createCondition(HealthCondition condition) {
         HealthCondition addedCondition = null;
 
-        try{
+        try {
             addedCondition = this.conditionRepository.save(condition);
         } catch (DataIntegrityViolationException ex) {
             if(ex.getMessage().contains("\"health_condition\" violates foreign key constraint \"fk_organisation\"")){
