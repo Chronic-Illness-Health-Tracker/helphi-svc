@@ -63,17 +63,19 @@ public class PatientService {
 
     public Patient addHealthConditionById(UUID patientId, UUID healthConditionId) {
         Optional<HealthCondition> healthCondition = this.healthConditionService.getCondition(healthConditionId);
+
         healthCondition.orElseThrow(() -> new NotFoundException(String.format("Condition with id %s does not exist", healthConditionId.toString())));
         return findAndAddCondition(patientId, healthCondition.get());
     }
 
     public Patient deleteHealthConditionById(UUID patientId, UUID healthConditionId) {
-        Optional<HealthCondition> healthCondition = this.healthConditionService.getCondition(healthConditionId);
-        healthCondition.orElseThrow(() -> new NotFoundException(String.format("Condition with id %s does not exist", healthConditionId.toString())));
+        this.healthConditionService.getCondition(healthConditionId)
+                .orElseThrow(() -> new NotFoundException(String.format("Condition with id %s does not exist", healthConditionId.toString())));
 
         return this.patientRepository.findById(patientId)
             .map(patient -> {
                 List<HealthCondition> patientConditions = patient.getConditions();
+                
                 HealthCondition conditionToRemove = patientConditions.stream()
                     .filter(condition -> condition.getId().equals(healthConditionId)).findFirst()
                     .orElseThrow(() -> new NotFoundException(String.format("Patient is not associated with condition with id %s", healthConditionId)));
