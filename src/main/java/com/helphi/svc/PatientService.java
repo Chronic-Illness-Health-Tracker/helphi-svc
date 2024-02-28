@@ -31,12 +31,8 @@ public class PatientService {
         this.questionSvc = questionSvc;
     }
     
-    public Optional<Patient> getPatient(UUID patientId) throws NotFoundException {
-        try {
-            return this.patientRepository.findById(patientId);
-        } catch (IllegalArgumentException ex) {
-            throw new NotFoundException(String.format("Patient with id %s cannot be found", patientId.toString()));
-        }
+    public Optional<Patient> getPatient(UUID patientId) throws IllegalArgumentException {
+        return this.patientRepository.findById(patientId);
     }
 
     public Patient createPatient(Patient patient) throws IllegalArgumentException {

@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS helphi.health_condition (
     CONSTRAINT fk_organisation FOREIGN KEY(organisation_id) REFERENCES helphi.organisation(id)
 );
 
-CREATE TABLE IF NOT EXISTS helphi.clinitian (
+CREATE TABLE IF NOT EXISTS helphi.clinician (
     id UUID NOT NULL DEFAULT extensions.uuid_generate_v4(),
     organisation_id UUID REFERENCES helphi.organisation(id),
     title USER_TITLE,
