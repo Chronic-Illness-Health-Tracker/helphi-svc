@@ -7,6 +7,7 @@ import com.helphi.repository.GpSurgeryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -40,6 +41,12 @@ public class GpSurgeryService {
         } catch (IllegalArgumentException ex) {
             throw new NotFoundException(String.format("Gp with id %s cannot be found", gpSurgeryId.toString()));
         }
+    }
 
+    public List<GpSurgery> getSurgeriesByName(String surgeryName) {
+        if(surgeryName == null) {
+            return this.gpSurgeryRepository.findAll();
+        }
+        return this.gpSurgeryRepository.findByName(surgeryName.toLowerCase());
     }
 }

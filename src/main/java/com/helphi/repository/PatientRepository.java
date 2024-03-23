@@ -14,4 +14,12 @@ public interface PatientRepository extends JpaRepository<Patient, UUID> {
 
     @Query("SELECT p FROM Patient p JOIN p.conditions c WHERE c.id = :conditionId")
     List<Patient> findByHealthConditionId(@Param("conditionId") UUID conditionId);
+
+    @Query("SELECT p FROM Patient p WHERE p.nhsNumber LIKE %:nhsNumber%")
+    List<Patient> findByNHSNumber(@Param("nhsNumber") String nhsNumber);
+
+    @Query("SELECT p FROM Patient p " +
+            "WHERE CONCAT(p.forename, ' ', p.middlenames, ' ', p.lastname) LIKE %:searchValue% OR " +
+            "CONCAT(p.forename, ' ', p.lastname) LIKE %:searchValue%")
+    List<Patient> findByName(@Param("searchValue") String searchValue);
 }

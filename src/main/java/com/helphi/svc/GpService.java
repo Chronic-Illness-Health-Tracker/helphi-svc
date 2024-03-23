@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,6 +42,9 @@ public class GpService {
         } catch (IllegalArgumentException ex) {
             throw new NotFoundException(String.format("Gp with id %s cannot be found", gpId.toString()));
         }
+    }
 
+    public List<Gp> getAllGpInSurgery(UUID surgeryId) {
+        return this.gpRepository.findBySurgeryId(surgeryId);
     }
 }

@@ -7,6 +7,7 @@ import com.helphi.api.user.Patient;
 import com.helphi.exception.NotFoundException;
 import com.helphi.svc.PatientService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -121,11 +122,33 @@ public class PatientController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "List of patients",
             content = { @Content(mediaType = "application/json",
-                schema = @Schema(implementation = Patient.class)) })
+                    array = @ArraySchema(schema = @Schema(implementation = Patient.class))) })
     })
     @GetMapping(value = "/patient/health-Condition/{conditionId}")
     public List<Patient> getPatientsInCondition(@PathVariable String conditionId){
         return this.patientService.getPatientsInCondition(UUID.fromString(conditionId));
+    }
+
+    @Operation(summary = "Get a list of patients")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of patients",
+                    content = { @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = Patient.class))) })
+    })
+    @GetMapping(value = "/patient")
+    public List<Patient> getPatients(@RequestParam Optional<String> value) {
+        List<Patient> patients;
+        if(value.isPresent()){
+            patients = this.patientService.getPatients(value.get());
+        } else {
+            patients = this.patientService.getPatients();
+        }
+
+        if(patients.size()> 50) {
+            return patients.subList(0, 49);
+        } else {
+            return  patients;
+        }
     }
 
 

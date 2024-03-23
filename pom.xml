@@ -144,6 +144,10 @@
 							<configOptions>
 								<sourceFolder>src/gen/java/main</sourceFolder>
 							</configOptions>
+							<additionalProperties>
+								<additionalProperty>useOverride=true</additionalProperty>
+							</additionalProperties>
+							
 						</configuration>
 					</execution>
 				</executions>

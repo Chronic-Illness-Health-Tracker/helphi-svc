@@ -5,6 +5,7 @@ import com.helphi.api.GpSurgery;
 import com.helphi.svc.GpService;
 import com.helphi.svc.GpSurgeryService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -71,5 +73,21 @@ public class GpSurgeryController {
     @DeleteMapping(value = "/gp-surgery/{gpSurgeryId}")
     public void deleteGpSurgery(@PathVariable String gpSurgeryId) {
         this.gpSurgeryService.deleteGpSurgery(UUID.fromString(gpSurgeryId));
+    }
+
+    @Operation(summary = "List of GP Surgeries")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of GP Surgeries",
+                    content = { @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = GpSurgery.class))) })
+    })
+    @GetMapping(value = "/gp-surgery")
+    public List<GpSurgery> listGpSurgeries(@RequestParam String surgeryName) {
+        List<GpSurgery> surgeries = this.gpSurgeryService.getSurgeriesByName(surgeryName);
+        if(surgeries.size()> 50) {
+            return surgeries.subList(0, 49);
+        } else {
+            return  surgeries;
+        }
     }
 }

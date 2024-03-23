@@ -1,9 +1,11 @@
 package com.helphi.controller;
 
 import com.helphi.api.Gp;
+import com.helphi.api.GpSurgery;
 import com.helphi.api.organisation.Organisation;
 import com.helphi.svc.GpService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -11,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,7 +25,6 @@ public class GpController {
     public GpController(GpService gpService) {
         this.gpService = gpService;
     }
-
 
     @Operation(summary = "Get a GP by its ID")
     @ApiResponses(value = {
@@ -71,6 +73,18 @@ public class GpController {
     @DeleteMapping(value = "/gp/{gpId}")
     public void deleteGp(@PathVariable String gpId) {
         this.gpService.deleteGp(UUID.fromString(gpId));
+    }
+
+    @Operation(summary = "Get all GPs that belong to a surgery")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "GPs found",
+                    content = { @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = Gp.class))) }),
+            @ApiResponse(responseCode = "400", description = "Invalid surgery ID",
+                    content = @Content) })
+    @GetMapping(value = "/gp/all/{surgeryId}")
+    public List<Gp> getAllGpInSurgery(@PathVariable String surgeryId) {
+        return this.gpService.getAllGpInSurgery(UUID.fromString(surgeryId));
     }
 
 }

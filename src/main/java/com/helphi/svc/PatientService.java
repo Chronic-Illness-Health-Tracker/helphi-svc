@@ -116,4 +116,28 @@ public class PatientService {
                 })
                 .orElseThrow(() -> new NotFoundException(String.format("Patient with ID %s could not be found", patientId.toString())));
     }
+
+    public List<Patient> getPatients() {
+        return this.patientRepository.findAll();
+
+    }
+
+    public List<Patient> getPatients(String searchValue) {
+        String isANumberTestStr = searchValue.replaceAll("\\s", "");
+        try {
+            Integer.parseInt(isANumberTestStr);
+            return getPatientByNHSNumber(isANumberTestStr);
+        }
+        catch(Exception e) {
+            return getPatientByName(searchValue);
+        }
+    }
+
+    private List<Patient> getPatientByNHSNumber(String nhsNumber){
+        return this.patientRepository.findByNHSNumber(nhsNumber);
+    }
+
+    private List<Patient> getPatientByName(String name){
+        return this.patientRepository.findByName(name);
+    }
 }
