@@ -1,6 +1,7 @@
 package com.helphi.svc;
 
 import com.helphi.api.HealthCondition;
+import com.helphi.api.organisation.Organisation;
 import com.helphi.exception.ForeignKeyConstraintException;
 import com.helphi.repository.HealthConditionRepository;
 import org.postgresql.util.PSQLException;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -45,5 +47,13 @@ public class HealthConditionService {
     }
     public void deleteCondition(UUID conditionId) {
         this.conditionRepository.deleteById(conditionId);
+    }
+
+    public List<HealthCondition> listHealthConditionsByName(String healthConditionName) {
+        if(healthConditionName == null) {
+            return this.conditionRepository.findAll();
+        } else {
+            return this.conditionRepository.findByName(healthConditionName.toLowerCase());
+        }
     }
 }

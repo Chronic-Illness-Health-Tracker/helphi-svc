@@ -1,8 +1,10 @@
 package com.helphi.controller;
 
 import com.helphi.api.HealthCondition;
+import com.helphi.api.organisation.Organisation;
 import com.helphi.svc.HealthConditionService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,5 +53,16 @@ public class HealthConditionController {
     @DeleteMapping(value = "/name/{conditionId}")
     public void deleteCondition(@PathVariable(name = "conditionId") String conditionId) {
         this.conditionService.deleteCondition(UUID.fromString(conditionId));
+    }
+
+    @Operation(summary = "List of Health conditions")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of Health Conditions",
+                    content = { @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = HealthCondition.class))) })
+    })
+    @GetMapping(value = "/condition")
+    public List<HealthCondition> listHealthConditions(@RequestParam String healthConditionName) {
+        return this.conditionService.listHealthConditionsByName(healthConditionName);
     }
 }

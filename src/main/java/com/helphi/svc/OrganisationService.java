@@ -7,6 +7,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -47,5 +48,13 @@ public class OrganisationService {
         address.ifPresent(organisation::setContactAddress);
 
         return this.organisationRepository.save(organisation);
+    }
+
+    public List<Organisation> listOrganisationsByName(String organisationName) {
+        if(organisationName == null) {
+            return this.organisationRepository.findAll();
+        } else {
+            return this.organisationRepository.findByName(organisationName.toLowerCase());
+        }
     }
 }

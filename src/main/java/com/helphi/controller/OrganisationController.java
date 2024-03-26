@@ -1,9 +1,11 @@
 package com.helphi.controller;
 
+import com.helphi.api.GpSurgery;
 import com.helphi.api.HealthCondition;
 import com.helphi.api.organisation.Organisation;
 import com.helphi.svc.OrganisationService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -72,5 +75,14 @@ public class OrganisationController {
         this.organisationService.deleteOrganisation(UUID.fromString(organisationId));
     }
 
-
+    @Operation(summary = "List of Organisations")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of Organisations",
+                    content = { @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = Organisation.class))) })
+    })
+    @GetMapping(value = "/organisation")
+    public List<Organisation> listOrganisations(@RequestParam String organisationName) {
+        return this.organisationService.listOrganisationsByName(organisationName);
+    }
 }
