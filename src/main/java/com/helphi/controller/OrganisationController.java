@@ -82,7 +82,7 @@ public class OrganisationController {
                             array = @ArraySchema(schema = @Schema(implementation = Organisation.class))) })
     })
     @GetMapping(value = "/organisation")
-    public List<Organisation> listOrganisations(@RequestParam String organisationName) {
+    public List<Organisation> listOrganisations(@RequestParam(required = false) String organisationName) {
         return this.organisationService.listOrganisationsByName(organisationName);
     }
 }

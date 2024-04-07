@@ -2,6 +2,8 @@ package com.helphi.controller;
 
 import com.helphi.api.HealthCondition;
 import com.helphi.api.organisation.Organisation;
+import com.helphi.question.api.ConditionCheckIn;
+import com.helphi.question.api.Question;
 import com.helphi.svc.HealthConditionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -62,7 +64,36 @@ public class HealthConditionController {
                             array = @ArraySchema(schema = @Schema(implementation = HealthCondition.class))) })
     })
     @GetMapping(value = "/condition")
-    public List<HealthCondition> listHealthConditions(@RequestParam String healthConditionName) {
+    public List<HealthCondition> listHealthConditions(@RequestParam(required = false) String healthConditionName) {
         return this.conditionService.listHealthConditionsByName(healthConditionName);
+    }
+
+    @Operation(summary = "Add a question to an existing health condition")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Created question",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Question.class)) }),
+            @ApiResponse(responseCode = "400", description = "Could not add question",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Health condition not found",
+                    content = @Content)})
+    @PostMapping(value = "/condition/{conditionId}/question")
+    public ResponseEntity<Question> getCondition(@PathVariable(name = "conditionId") String conditionId, @RequestBody Question question) {
+        Question createdQuestion = this.conditionService.addQuestionToHealthCondition(UUID.fromString(conditionId), question);
+        return ResponseEntity.status(202).body(createdQuestion);
+    }
+
+    @Operation(summary = "Update a check ins information")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Updated",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ConditionCheckIn.class)) }),
+            @ApiResponse(responseCode = "404", description = "Health condition not found",
+                    content = @Content)})
+    @PutMapping(value = "/condition/{conditionId}/checkin")
+    public ResponseEntity<ConditionCheckIn> getCondition(@PathVariable(name = "conditionId") String conditionId,
+                                                         @RequestBody ConditionCheckIn checkIn) {
+        this.conditionService.updateCheckIn(conditionId, checkIn);
+        return ResponseEntity.ok(checkIn);
     }
 }

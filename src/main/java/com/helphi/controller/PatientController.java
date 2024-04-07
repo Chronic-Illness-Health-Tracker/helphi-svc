@@ -5,6 +5,8 @@ import com.helphi.api.GpSurgery;
 import com.helphi.api.HealthCondition;
 import com.helphi.api.user.Patient;
 import com.helphi.exception.NotFoundException;
+import com.helphi.question.api.PatientStatus;
+import com.helphi.question.api.UserResponse;
 import com.helphi.svc.PatientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -151,5 +153,37 @@ public class PatientController {
         }
     }
 
+    @Operation(summary = "Provide and answer to a question")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Question submitted",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserResponse.class)) }),
+            @ApiResponse(responseCode = "400", description = "Could not save response",
+                    content = @Content) })
+    @PostMapping(value = "/patient/answer")
+    public UserResponse addAnswer(@RequestBody UserResponse response) throws NotFoundException {
+        return this.patientService.addAnswerToQuestion(response);
+    }
 
+    @Operation(summary = "Get patients status over the last 30 days")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of patient statuses",
+                    content = { @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = PatientStatus.class))) })
+    })
+    @GetMapping(value = "/patient/{patientId}/status/{conditionId}")
+    public List<PatientStatus> getStatus(@PathVariable String patientId, @PathVariable String conditionId) throws NotFoundException {
+        return this.patientService.getRecentPatientStatus(UUID.fromString(patientId), UUID.fromString(conditionId));
+    }
+
+    @Operation(summary = "Get patients most recent status")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Got status",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserResponse.class)) })
+    })
+    @GetMapping(value = "/patient/{patientId}/status/{conditionId}/recent")
+    public PatientStatus getRecentStatus(@PathVariable String patientId, @PathVariable String conditionId) throws NotFoundException {
+        return this.patientService.getMostRecentPatientStatus(UUID.fromString(patientId), UUID.fromString(conditionId));
+    }
 }

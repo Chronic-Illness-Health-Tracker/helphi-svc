@@ -2,6 +2,7 @@ package com.helphi.svc;
 
 import com.helphi.api.Address;
 import com.helphi.api.organisation.Organisation;
+import com.helphi.question.api.grpc.QuestionServiceGrpc;
 import com.helphi.repository.OrganisationRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,6 @@ public class OrganisationService {
         organisation.setId(null);
         return validateAndSave(organisation);
     }
-
 
     public Organisation updateOrganisation(Organisation organisation) throws IllegalArgumentException, EntityNotFoundException {
         return validateAndSave(organisation);

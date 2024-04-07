@@ -2,15 +2,25 @@ package com.helphi.svc;
 
 import com.helphi.api.HealthCondition;
 import com.helphi.api.user.Patient;
+import com.helphi.api.user.User;
 import com.helphi.exception.DuplicateEntityException;
 import com.helphi.exception.NotFoundException;
-import com.helphi.question.api.grpc.*;
+import com.helphi.question.api.PatientStatus;
+import com.helphi.question.api.UserResponse;
+import com.helphi.question.api.grpc.GetUserStatusRequest;
+import com.helphi.question.api.grpc.ListPatientStatusRequest;
+import com.helphi.question.api.grpc.PatientStatusList;
+import com.helphi.question.api.grpc.QuestionServiceGrpc;
+import com.helphi.question.api.mapper.PatientStatusMapper;
+import com.helphi.question.api.mapper.UserResponseMapper;
 import com.helphi.repository.HealthConditionRepository;
 import com.helphi.repository.PatientRepository;
 import jakarta.persistence.EntityNotFoundException;
+import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -89,18 +99,6 @@ public class PatientService {
 
     }
 
-    public void getPatientCheckInsForCondition(UUID userId, UUID conditionId) {
-/*        var request = GetUsersResponsesForConditionRequest.newBuilder()
-                .setUserId(userId.toString())
-                .setConditionId(conditionId.toString())
-                .build();
-
-        GetUserResponsesReply response = this.questionSvc.getUsersResponsesForCondition(request);
-
-        *//*TODO return response */
-
-    }
-
     private Patient findAndAddCondition(UUID patientId, HealthCondition healthCondition) {
         return this.patientRepository.findById(patientId)
                 .map(patient ->  {
@@ -133,6 +131,55 @@ public class PatientService {
         }
     }
 
+    public UserResponse addAnswerToQuestion(UserResponse response) {
+        Optional<Patient> patient = this.getPatient(UUID.fromString(response.getUserId()));
+        if(patient.isEmpty()){
+            throw new NotFoundException(String.format("Patient with ID: %s does not exist", response.getUserId()));
+        }
+        Optional<HealthCondition> condition = this.healthConditionService.getCondition(UUID.fromString(response.getConditionId()));
+
+        if(condition.isEmpty()) {
+            throw new NotFoundException(String.format("Condition with ID: %s cannot be found", response.getConditionId()));
+        }
+
+        UserResponseMapper mapper = new UserResponseMapper();
+
+        com.helphi.question.api.grpc.UserResponse createdResponse = this.questionSvc.addUserResponse(mapper.mapToGrpc(response));
+        return mapper.mapFromGrpc(createdResponse);
+    }
+
+    public List<PatientStatus> getRecentPatientStatus(UUID patientId, UUID conditionId) {
+        var request = ListPatientStatusRequest.newBuilder()
+                .setPatientId(patientId.toString())
+                .setConditionId(conditionId.toString())
+                .setDays(30)
+                .build();
+        PatientStatusList grpcStatuses = this.questionSvc.getRecentPatientStatus(request);
+
+        PatientStatusMapper mapper = new PatientStatusMapper();
+
+        List<PatientStatus> patientStatuses = new ArrayList<>();
+        for (com.helphi.question.api.grpc.PatientStatus status : grpcStatuses.getStatusesList()) {
+            patientStatuses.add(mapper.mapFromGrpc(status));
+        }
+
+        return patientStatuses;
+    }
+
+    public PatientStatus getMostRecentPatientStatus(UUID patientId, UUID conditionId) {
+        var request = GetUserStatusRequest.newBuilder()
+                .setUserId(patientId.toString())
+                .setConditionId(conditionId.toString())
+                .build();
+        com.helphi.question.api.grpc.PatientStatus grpcStatus = this.questionSvc.getCurrentPatientStatus(request);
+
+        PatientStatusMapper mapper = new PatientStatusMapper();
+
+        return mapper.mapFromGrpc(grpcStatus);
+    }
+
+
+
     private List<Patient> getPatientByNHSNumber(String nhsNumber){
         return this.patientRepository.findByNHSNumber(nhsNumber);
     }
@@ -140,4 +187,6 @@ public class PatientService {
     private List<Patient> getPatientByName(String name){
         return this.patientRepository.findByName(name);
     }
+
+
 }
