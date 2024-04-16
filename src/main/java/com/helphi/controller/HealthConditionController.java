@@ -78,7 +78,7 @@ public class HealthConditionController {
             @ApiResponse(responseCode = "404", description = "Health condition not found",
                     content = @Content)})
     @PostMapping(value = "/condition/{conditionId}/question")
-    public ResponseEntity<Question> getCondition(@PathVariable(name = "conditionId") String conditionId, @RequestBody Question question) {
+    public ResponseEntity<Question> addQuestion(@PathVariable(name = "conditionId") String conditionId, @RequestBody Question question) {
         Question createdQuestion = this.conditionService.addQuestionToHealthCondition(UUID.fromString(conditionId), question);
         return ResponseEntity.status(202).body(createdQuestion);
     }
@@ -91,9 +91,44 @@ public class HealthConditionController {
             @ApiResponse(responseCode = "404", description = "Health condition not found",
                     content = @Content)})
     @PutMapping(value = "/condition/{conditionId}/checkin")
-    public ResponseEntity<ConditionCheckIn> getCondition(@PathVariable(name = "conditionId") String conditionId,
+    public ResponseEntity<ConditionCheckIn> updateCheckIn(@PathVariable(name = "conditionId") String conditionId,
                                                          @RequestBody ConditionCheckIn checkIn) {
         this.conditionService.updateCheckIn(conditionId, checkIn);
         return ResponseEntity.ok(checkIn);
+    }
+
+    @Operation(summary = "get a check ins information")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ConditionCheckIn.class)) }),
+            @ApiResponse(responseCode = "404", description = "Health condition not found",
+                    content = @Content)})
+    @GetMapping(value = "/condition/{conditionId}/checkin")
+    public ResponseEntity<ConditionCheckIn> getCheckIn(@PathVariable(name = "conditionId") String conditionId) {
+        ConditionCheckIn checkIn = this.conditionService.getCheckIn(UUID.fromString(conditionId));
+        return ResponseEntity.ok(checkIn);
+    }
+
+    @Operation(summary = "List of Health condition questions")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of Health Condition questions",
+                    content = { @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = Question.class))) })
+    })
+    @GetMapping(value = "/condition/{conditionId}/questions")
+    public List<Question> getHealthConditionQuestions(@PathVariable(name = "conditionId") String conditionId) {
+        return this.conditionService.listConditionQuestions(UUID.fromString(conditionId));
+    }
+
+    @Operation(summary = "Update or add a  group of questions to an existing health condition")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Questions added/updated",
+                    content = { @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = Question.class))) })})
+    @PutMapping(value = "/condition/{conditionId}/questions")
+    public ResponseEntity<Question> updateQuestions(@PathVariable(name = "conditionId") String conditionId, @RequestBody List<Question> questions) {
+        this.conditionService.addQuestionsToHealthCondition(UUID.fromString(conditionId), questions);
+        return ResponseEntity.status(200).build();
     }
 }

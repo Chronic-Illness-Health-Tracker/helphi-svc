@@ -112,13 +112,14 @@
 				<version>1.4</version>
 				<executions>
 					<execution>
+						<id>integration-test</id>
 						<goals>
 							<goal>generate</goal>
 						</goals>
 					</execution>
 				</executions>
-				<configuration> 
-					<apiDocsUrl>http://localhost:8080/v3/api-docs</apiDocsUrl> 
+				<configuration>
+					<apiDocsUrl>http://localhost:8080/v3/api-docs</apiDocsUrl>
 					<outputFileName>openapi.json</outputFileName> 
 					<outputDir>${project.build.directory}</outputDir>
 				</configuration>
@@ -142,7 +143,6 @@
 							<additionalProperties>
 								<additionalProperty>useOverride=true</additionalProperty>
 							</additionalProperties>
-							
 						</configuration>
 					</execution>
 				</executions>

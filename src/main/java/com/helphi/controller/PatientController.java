@@ -180,10 +180,11 @@ public class PatientController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Got status",
                     content = { @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = UserResponse.class)) })
+                            schema = @Schema(implementation = PatientStatus.class)) })
     })
     @GetMapping(value = "/patient/{patientId}/status/{conditionId}/recent")
     public PatientStatus getRecentStatus(@PathVariable String patientId, @PathVariable String conditionId) throws NotFoundException {
         return this.patientService.getMostRecentPatientStatus(UUID.fromString(patientId), UUID.fromString(conditionId));
     }
+
 }

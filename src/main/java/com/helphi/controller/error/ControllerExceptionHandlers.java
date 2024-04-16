@@ -15,43 +15,36 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ControllerExceptionHandlers {
-//    @ExceptionHandler(value = { ConstraintViolationException.class })
-//    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-//    public ResponseEntity<?> resourceNotFoundException(ConstraintViolationException ex) {
-//        StringBuilder sb = new StringBuilder();
-//        ex.getConstraintViolations().forEach(constraintViolation -> {
-//            sb.append(constraintViolation.getMessage());
-//            sb.append(System.lineSeparator());
-//        });
-//        HelphiErrorMessage msg = new HelphiErrorMessage(sb.toString());
-//        return ResponseEntity.badRequest().body(msg);
-//    }
+    @ExceptionHandler(value = { ConstraintViolationException.class })
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ResponseEntity<?> resourceNotFoundException(ConstraintViolationException ex) {
+        StringBuilder sb = new StringBuilder();
+        ex.getConstraintViolations().forEach(constraintViolation -> {
+            sb.append(constraintViolation.getMessage());
+            sb.append(System.lineSeparator());
+        });
+        HelphiErrorMessage msg = new HelphiErrorMessage(sb.toString());
+        return ResponseEntity.badRequest().body(msg);
+    }
 
-//    @ExceptionHandler(value = { ForeignKeyConstraintException.class })
-//    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-//    public ResponseEntity<?> foreignKeyConstraintException(ForeignKeyConstraintException ex) {
-//        HelphiErrorMessage msg = new HelphiErrorMessage(ex.getLocalizedMessage());
-//        return ResponseEntity.badRequest().body(msg);
-//    }
+    @ExceptionHandler(value = { ForeignKeyConstraintException.class })
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ResponseEntity<?> foreignKeyConstraintException(ForeignKeyConstraintException ex) {
+        HelphiErrorMessage msg = new HelphiErrorMessage(ex.getLocalizedMessage());
+        return ResponseEntity.badRequest().body(msg);
+    }
 
     @ExceptionHandler(value = { NotFoundException.class })
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     public ResponseEntity<?> notFoundException(NotFoundException ex) {
         HelphiErrorMessage msg = new HelphiErrorMessage(ex.getLocalizedMessage());
-        return ResponseEntity.badRequest().body(msg);
+        return ResponseEntity.status(404).body(msg);
     }
 
-//    @ExceptionHandler(value = { DuplicateEntityException.class })
-//    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-//    public ResponseEntity<?> duplicateEntity(DuplicateEntityException ex) {
-//        HelphiErrorMessage msg = new HelphiErrorMessage(ex.getLocalizedMessage(), ex.getDetails());
-//        return ResponseEntity.badRequest().body(msg);
-//    }
-
-/*    @ExceptionHandler(value = { Throwable.class })
+    @ExceptionHandler(value = { DuplicateEntityException.class })
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ResponseEntity<?> genericException(Throwable ex) {
-        ErrorMessage msg = new ErrorMessage("Could not complete request");
+    public ResponseEntity<?> duplicateEntity(DuplicateEntityException ex) {
+        HelphiErrorMessage msg = new HelphiErrorMessage(ex.getLocalizedMessage(), ex.getDetails());
         return ResponseEntity.badRequest().body(msg);
-    }*/
+    }
 }

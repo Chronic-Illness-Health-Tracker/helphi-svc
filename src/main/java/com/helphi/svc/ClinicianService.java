@@ -2,6 +2,7 @@ package com.helphi.svc;
 
 
 import com.helphi.api.user.Clinician;
+import com.helphi.api.user.Patient;
 import com.helphi.exception.NotFoundException;
 import com.helphi.repository.ClinicianRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,10 @@ public class ClinicianService {
         return this.clinicianRepository.findById(clinician.getId())
                 .map(existingPatient -> this.clinicianRepository.save(clinician))
                 .orElseThrow(() -> new NotFoundException(String.format("clinician with id %s cannot be found", clinician.getId().toString())));
+    }
+
+    public Optional<Clinician> getByUserId(String userId) {
+        return this.clinicianRepository.findByUserId(userId);
     }
     
 }

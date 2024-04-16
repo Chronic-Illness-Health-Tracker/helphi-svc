@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -22,4 +23,9 @@ public interface PatientRepository extends JpaRepository<Patient, UUID> {
             "WHERE CONCAT(p.forename, ' ', p.middlenames, ' ', p.lastname) LIKE %:searchValue% OR " +
             "CONCAT(p.forename, ' ', p.lastname) LIKE %:searchValue%")
     List<Patient> findByName(@Param("searchValue") String searchValue);
+
+
+    @Query("SELECT p FROM Patient p WHERE p.userId = :userId")
+    Optional<Patient> findByUserId(@Param("userId") String userId);
+
 }

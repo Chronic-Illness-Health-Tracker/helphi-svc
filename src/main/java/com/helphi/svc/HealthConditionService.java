@@ -5,9 +5,9 @@ import com.helphi.api.organisation.Organisation;
 import com.helphi.exception.ForeignKeyConstraintException;
 import com.helphi.exception.NotFoundException;
 import com.helphi.question.api.Question;
-import com.helphi.question.api.grpc.ConditionCheckIn;
-import com.helphi.question.api.grpc.QuestionRequest;
-import com.helphi.question.api.grpc.QuestionServiceGrpc;
+import com.helphi.question.api.grpc.*;
+import com.helphi.question.api.mapper.AnswerMapper;
+import com.helphi.question.api.mapper.CheckInMapper;
 import com.helphi.question.api.mapper.QuestionMapper;
 import com.helphi.repository.HealthConditionRepository;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -16,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class HealthConditionService {
@@ -82,12 +79,16 @@ public class HealthConditionService {
             throw new NotFoundException(String.format("Condition with id: %s does not exist", conditionId.toString()));
         }
 
+        AnswerMapper mapper = new AnswerMapper();
+        List<Answer> grpcAnswers = new ArrayList<>();
+        for(com.helphi.question.api.Answer answer : question.getPossibleAnswers()) {
+            grpcAnswers.add(mapper.mapToGrpc(answer));
+        }
         QuestionRequest request = QuestionRequest.newBuilder()
                 .setConditionId(question.getConditionId())
                 .setQuestionType(String.valueOf(question.getQuestionType()))
-                .addAllPossibleAnswers(question.getPossibleAnswers())
+                .addAllPossibleAnswers(grpcAnswers)
                 .addAllAnswerScoreRange(question.getAnswerScoreRange())
-                .addAllAnswerScore(question.getAnswerScore())
                 .build();
 
         com.helphi.question.api.grpc.Question createdQuestion = this.questionSvc.addQuestion(request);
@@ -130,6 +131,58 @@ public class HealthConditionService {
                 .build();
 
         this.questionSvc.updateCheckIn(checkInGrpc);
+    }
+
+    public List<Question> listConditionQuestions(UUID conditionId) {
+
+        var request = GetConditionQuestionsRequest.newBuilder()
+                .setConditionId(conditionId.toString())
+                .build();
+
+        GetConditionQuestionsReply reply = this.questionSvc.getConditionQuestions(request);
+
+        List<com.helphi.question.api.grpc.Question> questionsGrpc = reply.getQuestionsList();
+
+        QuestionMapper mapper = new QuestionMapper();
+
+        List<Question> questions = new ArrayList<>();
+        for (com.helphi.question.api.grpc.Question question : questionsGrpc) {
+            questions.add(mapper.mapFromGrpc(question));
+        }
+
+        return questions;
+    }
+
+    public void addQuestionsToHealthCondition(UUID conditionId, List<Question> questions) {
+
+        for(Question question: questions) {
+            if(question.getQuestionId() == 0) {
+                question.setConditionId(conditionId.toString());
+                this.addQuestionToHealthCondition(conditionId, question);
+            } else {
+                this.updateQuestion(question);
+            }
+        }
+    }
+
+    public void updateQuestion(Question question) {
+        QuestionMapper mapper = new QuestionMapper();
+        this.questionSvc.updateQuestion(mapper.mapToGrpc(question));
+    }
+
+    public com.helphi.question.api.ConditionCheckIn getCheckIn(UUID conditionId) {
+        GetConditionCheckInRequest request = GetConditionCheckInRequest.newBuilder()
+                .setConditionId(conditionId.toString())
+                .build();
+
+        ConditionCheckIn grpcCheckIn = this.questionSvc.getCheckIn(request);
+
+        if(grpcCheckIn.getConditionId().isBlank()) {
+           throw new NotFoundException();
+        }
+
+        CheckInMapper mapper = new CheckInMapper();
+        return mapper.mapFromGrpc(grpcCheckIn);
     }
 
     private boolean validateCheckIn(com.helphi.question.api.ConditionCheckIn checkIn, String conditionId) {
