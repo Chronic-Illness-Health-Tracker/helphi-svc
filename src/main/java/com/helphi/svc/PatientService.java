@@ -183,7 +183,10 @@ public class PatientService {
         return this.patientRepository.findByUserId(userId);
     }
 
-
+    public List<HealthCondition> getHealthConditions(UUID patientId) {
+        Patient patient = this.patientRepository.getReferenceById(patientId);
+        return patient.getConditions();
+    }
 
     private List<Patient> getPatientByNHSNumber(String nhsNumber){
         return this.patientRepository.findByNHSNumber(nhsNumber);
