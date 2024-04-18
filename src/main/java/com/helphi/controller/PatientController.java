@@ -187,4 +187,15 @@ public class PatientController {
         return this.patientService.getMostRecentPatientStatus(UUID.fromString(patientId), UUID.fromString(conditionId));
     }
 
+    @Operation(summary = "Get health conditions a patient is a member of")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of health conditions",
+                    content = { @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = HealthCondition.class))) })
+    })
+    @GetMapping(value = "/patient/{patientId}/conditions")
+    public List<HealthCondition> getConditions(@PathVariable String patientId) throws NotFoundException {
+        return this.patientService.getHealthConditions(UUID.fromString(patientId));
+    }
+
 }
