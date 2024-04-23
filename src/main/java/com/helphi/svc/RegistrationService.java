@@ -69,7 +69,6 @@ public class RegistrationService {
                 throw new NotFoundException(String.format("User with id %s cannot be found", userId.toString()));
             }
         } else if(userType == UserTypes.CLINITIAN) {
-            System.out.println("GETTING CLINICIAN");
             clinicianService.getClinician(userId);
         }
 
@@ -98,8 +97,22 @@ public class RegistrationService {
         return userRegistrationRepository.save(registration);
     }
 
-    public boolean checkCodeValid(String registrationCode) {
-        Optional<Registration> registration = this.userRegistrationRepository.getbyCode(registrationCode);
-        return registration.isPresent();
+    public BaseUser validCode(String registrationCode) {
+        Optional<Registration> registrationOptional = this.userRegistrationRepository.getbyCode(registrationCode);
+
+        if(registrationOptional.isEmpty()) {
+            throw new NotFoundException();
+        }
+
+        Registration registration = registrationOptional.get();
+
+        Optional<Patient> patientOptional = this.patientService.getPatient(registration.getReferenceId());
+
+        if(patientOptional.isPresent()) {
+            return patientOptional.get();
+        }
+
+        //clinicians throw error if not found
+        return this.clinicianService.getClinician(registration.getReferenceId());
     }
 }

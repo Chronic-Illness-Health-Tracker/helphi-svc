@@ -52,7 +52,7 @@ public class HealthConditionController {
         return this.conditionService.updateCondition(condition);
     }
 
-    @DeleteMapping(value = "/name/{conditionId}")
+    @DeleteMapping(value = "/{conditionId}")
     public void deleteCondition(@PathVariable(name = "conditionId") String conditionId) {
         this.conditionService.deleteCondition(UUID.fromString(conditionId));
     }

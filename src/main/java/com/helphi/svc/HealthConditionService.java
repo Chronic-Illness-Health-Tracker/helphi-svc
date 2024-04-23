@@ -86,6 +86,7 @@ public class HealthConditionService {
         }
         QuestionRequest request = QuestionRequest.newBuilder()
                 .setConditionId(question.getConditionId())
+                .setQuestionText(question.getQuestionText())
                 .setQuestionType(String.valueOf(question.getQuestionType()))
                 .addAllPossibleAnswers(grpcAnswers)
                 .addAllAnswerScoreRange(question.getAnswerScoreRange())
@@ -154,7 +155,6 @@ public class HealthConditionService {
     }
 
     public void addQuestionsToHealthCondition(UUID conditionId, List<Question> questions) {
-
         for(Question question: questions) {
             if(question.getQuestionId() == 0) {
                 question.setConditionId(conditionId.toString());

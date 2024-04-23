@@ -42,12 +42,11 @@ public class RegistrationController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Code valid",
                     content = { @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Boolean.class)) })
+                            schema = @Schema(implementation = BaseUser.class)) })
     })
-    @PutMapping(value = "/register/{registrationCode}/valid")
-    public ResponseEntity<Boolean> codeValid(@PathVariable(name = "registrationCode" ) String registrationCode) {
-        boolean valid = this.registrationService.checkCodeValid(registrationCode);
-        return ResponseEntity.ok().body(valid);
+    @PutMapping(value = "/register/{registrationCode}")
+    public BaseUser submitCode(@PathVariable(name = "registrationCode" ) String registrationCode) {
+        return this.registrationService.validCode(registrationCode);
     }
 
     @Operation(summary = "Create a new registration code")
